@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Endereço por CEP (com jQuery)</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .caixa {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff; /* Mudei a cor para azul só para diferenciar da versão anterior */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #resultado {
+            margin-top: 15px;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="caixa">
+        <h2>Buscar Endereço</h2>
+        <input type="text" id="cep" placeholder="Digite o CEP (apenas números)" maxlength="8">
+        <button onclick="buscarCEP()">Buscar com jQuery</button>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        function buscarCEP() {
+            // Usando o jQuery ($) para pegar o valor do input
+            let cep = $('#cep').val().replace(/\D/g, '');
+            let $resultado = $('#resultado'); // Guardamos o elemento resultado numa variável
+
+            // Verifica se o CEP tem 8 dígitos
+            if (cep.length !== 8) {
+                $resultado.html('<p style="color: red;">Digite um CEP válido com 8 números.</p>');
+                return;
+            }
+
+            $resultado.html('<p>Buscando...</p>');
+
+            // Consulta a API do ViaCEP usando a função $.getJSON do jQuery
+            $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function(dados) {
+                if (dados.erro) {
+                    $resultado.html('<p style="color: red;">CEP não encontrado.</p>');
+                } else {
+                    // Mostra o resultado na tela usando a função .html() do jQuery
+                    $resultado.html(`
+                        <p><strong>Rua:</strong> ${dados.logradouro}</p>
+                        <p><strong>Bairro:</strong> ${dados.bairro}</p>
+                        <p><strong>Cidade:</strong> ${dados.localidade}</p>
+                        <p><strong>Estado:</strong> ${dados.uf}</p>
+                    `);
+                }
+            }).fail(function() {
+                // O .fail() captura erros (ex: se a internet cair)
+                $resultado.html('<p style="color: red;">Erro ao tentar buscar o CEP.</p>');
+            });
+        }
+    </script>
+
+</body>
+</html>
